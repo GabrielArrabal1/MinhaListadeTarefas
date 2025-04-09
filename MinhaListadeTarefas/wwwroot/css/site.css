@@ -20,3 +20,13 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.linha-vermelha {
+    background-color: #ffcccc; /* vermelho claro */
+    color: red; /* texto vermelho */
+    font-weight: bold;
+}
+.linha-tachada {
+    text-decoration: line-through;
+    color: gray;
+}

@@ -5,14 +5,17 @@
 *@
 @{
 }
-<h2>Essa é a minha index da lista de tarefas</h2>
+<h3>Aqui está o seu cronograma de Eventos!</h3>
 
-<table class="table table-striped">
+<table id="example" class="display" style="width:100%">
 
     <thead>
         <tr>
             <th>Id</th>
+            <th>Prioridade</th>
+            <th>Status</th>
             <th>Descricao</th>
+            <th>Observacao</th>
             <th>Data Inicio</th>
             <th>Data Fim</th>
             <th>Editar</th>
@@ -22,14 +25,58 @@
         @{
             foreach (var item in Model)
             {
-                <tr>
+                var linhaClasse = "";
+
+                if (item.PrioridadeId == 1)
+                {
+                    linhaClasse += "linha-vermelha ";
+                }
+                if (item.StatusId == 2)
+                {
+                    linhaClasse += "linha-tachada ";
+                }
+
+                <tr class="@linhaClasse">
                 <td>@item.Id</td>
+                    <td>@item.PrioridadeId</td>
+                    <td>@item.StatusId</td>
                     <td>@item.Descricao</td>
+                    <td>@item.Observacao</td>
                     <td>@item.Datainicio</td>
                     <td>@item.Datafim</td>
-                    <td><a class="btn btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Editar</a></td>
+                    <td><a class="btn btn-secondary" asp-action="Edit" asp-route-id="@item.Id"><i class="fa-solid fa-pen"></i>Editar</a></td>
                 </tr>
             }
         }
     </tbody>
+    <tfoot>
+        <tr>
+            <th>Id</th>
+            <th>Prioridade</th>
+            <th>Status</th>
+            <th>Descricao</th>
+            <th>Observacao</th>
+            <th>Data Inicio</th>
+            <th>Data Fim</th>
+            <th>Editar</th>
+        </tr>
+    </tfoot>
 </table>
+
+@section Scripts {
+<script>
+                new DataTable('#example', {
+            language: {
+            entries: 'Eventos',
+            info: 'Mostrando page _PAGE_ of _PAGES_',
+            infoEmpty: 'Sem dados',
+            search: 'Pesquisar',
+
+        }
+        });
+
+    //$("#example").DataTable();
+
+</script>
+
+}

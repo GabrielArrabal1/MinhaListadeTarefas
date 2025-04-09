@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MinhaListadeTarefas.Models;
 using MinhaListadeTarefas.Services;
+using System.Threading.Tasks;
 
 namespace MinhaListadeTarefas.Controllers
 {
@@ -18,41 +19,41 @@ namespace MinhaListadeTarefas.Controllers
             _serviceTarefa = new ServiceTarefa(_context);
         }
 
-        public tarefaController(AppDbContext context)
-        {
-            _context = context;
-        }
+        //public tarefaController(AppDbContext context)
+        //{
+        //    _context = context;
+        //}
 
         public async Task CarregaComboBox()
         {
             ViewData["Categorias"] = new SelectList(await _serviceTarefa.RptCategoria.ListarTodosAsync(), "Id", "Name");
-            ViewData["Prioridades"] = new SelectList(_context.Prioridades.ToList(), "Id", "Name");
-            ViewData["Responsavels"] = new SelectList(_context.Responsaveis.ToList(), "Id", "Name");
-            ViewData["Status"] = new SelectList(_context.Status.ToList(), "Id", "Name");
+            ViewData["Prioridades"] = new SelectList(await _serviceTarefa.RptPrioridade.ListarTodosAsync(), "Id", "Name");
+            ViewData["Responsavels"] = new SelectList(await _serviceTarefa.RptResponsavel.ListarTodosAsync(), "Id", "Name");
+            ViewData["Status"] = new SelectList(await _serviceTarefa.RptStatus.ListarTodosAsync(), "Id", "Name");
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
 
-            
+            var listatarefa = await _serviceTarefa.RptTarefa.ListarTodosAsync();
 
 
-            return View();
+            return View(listatarefa);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            CarregaComboBox();
+            await CarregaComboBox();
 
             return View();
         }
 
 
         [HttpPost]
-        public IActionResult Create(Tarefa tarefa)
+        public async Task<IActionResult> Create(Tarefa tarefa)
         {
-            CarregaComboBox();
+            await CarregaComboBox();
             if (tarefa.Datafim < tarefa.Datainicio)
             {
                 ModelState.AddModelError("DataInicio", "A data de Fim nao pode ser menor que a Data de Inicio");
@@ -61,15 +62,35 @@ namespace MinhaListadeTarefas.Controllers
             if (ModelState.IsValid)
             {
                 ViewData["Mensagem"] = "Dados salvos com sucesso!";
+                await _serviceTarefa.RptTarefa.IncluirAsync(tarefa);
                 return View(tarefa);
             }
-            
+
             return View();
         }
 
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
+            await CarregaComboBox();
+            var tarefa = await _serviceTarefa.RptTarefa.SelecionarChaveAsync(id);
+            return View();
+        }
 
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Tarefa tarefa)
+        {
+            await CarregaComboBox();
+            if (tarefa.Datafim < tarefa.Datainicio)
+            {
+                ModelState.AddModelError("DataInicio", "A data de Fim nao pode ser menor que a Data de Inicio");
+            }
+            if (ModelState.IsValid)
+            {
+                ViewData["Mensagem"] = "Dados salvos com sucesso!";
+                await _serviceTarefa.RptTarefa.AlterarAsync(tarefa);
+                return View(tarefa);
+            }
             return View();
         }
     }
